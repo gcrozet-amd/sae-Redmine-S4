@@ -48,17 +48,7 @@ services:
 
 volumes:
   postgres-storage:
-    #    driver: local
-    #    driver_opts:
-    #      type: none
-    #      device: ./postgres/postgres-storage/_data
-    #      o: bind
   redmine-storage:
-    #    driver: local
-    #    driver_opts:
-    #      type: none
-    #      device: ./redmine/redmine-storage/_data
-    #      o: bind
   redmine-plugins:
     driver: local
     driver_opts:
