@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:latest
+    hostname: postgres
+    networks:
+      management:
+        aliases:
+          - postgres
+    volumes:
+      - postgres-storage:/var/lib/postgresql/data
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=changeme
+      - POSTGRES_DB=redmine
+
+  redmine:
+    image: redmine:latest
+    hostname: redmine
+    ports:
+      - "3000"
+    networks:
+      management:
+        aliases:
+          - redmine
+    volumes:
+      - redmine-storage:/usr/src/redmine/files
+      - redmine-plugins:/usr/src/redmine/plugins
+    restart: always
+    environment:
+      - REDMINE_DB_DATABASE=redmine
+      - REDMINE_DB_PASSWORD=changeme
+      - REDMINE_DB_POSTGRES=postgres
+    depends_on:
+      db:
+        condition: service_started
+
+  proxy:
+    build: ./serv_proxy
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      management:
+        aliases:
+          - proxy
+
+volumes:
+  postgres-storage:
+    #    driver: local
+    #    driver_opts:
+    #      type: none
+    #      device: ./postgres/postgres-storage/_data
+    #      o: bind
+  redmine-storage:
+    #    driver: local
+    #    driver_opts:
+    #      type: none
+    #      device: ./redmine/redmine-storage/_data
+    #      o: bind
+  redmine-plugins:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./redmine/redmine-plugins
+      o: bind
+
+
+networks:
+  management:
+    driver: bridge
